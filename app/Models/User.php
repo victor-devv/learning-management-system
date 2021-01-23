@@ -45,11 +45,11 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
     ];
 
-    // mutator
-    public function setPasswordAttribute($password)
-    {
-        $this->attributes['password'] = Hash::make($password);
-    }
+    // // mutator
+    // public function setPasswordAttribute($password)
+    // {
+    //     $this->attributes['password'] = Hash::make($password);
+    // }
 
     public function roles()
     {

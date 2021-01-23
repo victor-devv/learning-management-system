@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Actions\Fortify\CreateNewUser;
 use App\Models\Role;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -57,31 +58,34 @@ class UserController extends Controller
     {
         // dd($request);
 
-        if ($request->msisdn) {
-            $user = User::create([
-                'first_name' => $request['first-name'],
-                'last_name' => $request['last-name'],
-                'msisdn' => $request['msisdn'],
-                'email' => $request['email'],
-                'password' => $request['password']
-            ]);
+        // if ($request->msisdn) {
+        //     $user = User::create([
+        //         'first_name' => $request['first-name'],
+        //         'last_name' => $request['last-name'],
+        //         'msisdn' => $request['msisdn'],
+        //         'email' => $request['email'],
+        //         'password' => $request['password']
+        //     ]);
 
-            $user->roles()->sync($request->roles);
-    
-            session()->flash('success', 'User Created Successfully!');
-    
-            return redirect(route('admin.users.index'));
-    
-        }
+        //     $user->roles()->sync($request->roles);
 
-        $user = User::create([
-            'first_name' => $request['first-name'],
-            'last_name' => $request['last-name'],
-            'email' => $request['email'],
-            'password' => $request['password']
-        ]);
+        //     session()->flash('success', 'User Created Successfully!');
 
-        // $user->roles()->attach($request->roles);
+        //     return redirect(route('admin.users.index'));
+
+        // }
+
+        // $user = User::create([
+        //     'first_name' => $request['first-name'],
+        //     'last_name' => $request['last-name'],
+        //     'email' => $request['email'],
+        //     'password' => $request['password']
+        // ]);
+
+        $newUser = new CreateNewUser();
+
+        $user = $newUser->create(array_merge($request->only('first-name', 'last-name', 'email', 'password', 'password_confirmation'), ['msisdn' => null]));
+
         $user->roles()->sync($request->roles);
 
         session()->flash('success', 'User Created Successfully!');

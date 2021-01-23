@@ -20,6 +20,8 @@ class CreateNewUser implements CreatesNewUsers
      */
     public function create(array $input)
     {
+        // dd($input);
+
         Validator::make($input, [
             'first-name' => ['required', 'string', 'max:255'],
             'last-name' => ['required', 'string', 'max:255'],
@@ -31,7 +33,7 @@ class CreateNewUser implements CreatesNewUsers
                 Rule::unique(User::class),
             ],
             'msisdn' => [
-                'required',
+                'nullable',
                 'numeric',
                 'min::11',
                 'max:11',
