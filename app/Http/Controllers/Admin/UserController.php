@@ -2,14 +2,16 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Actions\Fortify\CreateNewUser;
 use App\Models\Role;
 use App\Models\User;
+use App\Models\Mentee;
+use App\Models\Mentor;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use App\Http\Requests\UserRequest;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Gate;
+use App\Actions\Fortify\CreateNewUser;
 
 class UserController extends Controller
 {
@@ -45,7 +47,11 @@ class UserController extends Controller
      */
     public function create()
     {
-        return view('admin.users.create', ['roles' => Role::all()]);
+        return view('admin.users.create', [
+            'roles' => Role::all(),
+            'mentors' => Mentor::all(),
+            'mentees' => Mentee::all()
+        ]);
     }
 
     /**
@@ -58,33 +64,31 @@ class UserController extends Controller
     {
         // dd($request);
 
-        // if ($request->msisdn) {
-        //     $user = User::create([
-        //         'first_name' => $request['first-name'],
-        //         'last_name' => $request['last-name'],
-        //         'msisdn' => $request['msisdn'],
-        //         'email' => $request['email'],
-        //         'password' => $request['password']
-        //     ]);
-
-        //     $user->roles()->sync($request->roles);
-
-        //     session()->flash('success', 'User Created Successfully!');
-
-        //     return redirect(route('admin.users.index'));
-
-        // }
-
-        // $user = User::create([
-        //     'first_name' => $request['first-name'],
-        //     'last_name' => $request['last-name'],
-        //     'email' => $request['email'],
-        //     'password' => $request['password']
-        // ]);
-
         $newUser = new CreateNewUser();
 
         $user = $newUser->create(array_merge($request->only('first-name', 'last-name', 'email', 'password', 'password_confirmation'), ['msisdn' => null]));
+
+        //Add mentor
+        if (in_array('3', $request->roles)) {
+
+            $mentor = Mentor::create([
+                'first_name' => $user->first_name,
+                'last_name' => $user->last_name,
+                'user_id' => $user->id
+            ]);
+
+            if ($request->mentees) {
+                $mentor->mentees()->sync($request->mentees);
+            }
+        } else if (in_array('4', $request->roles)) {
+
+            $mentee = Mentee::create([
+                'first_name' => $user->first_name,
+                'last_name' => $user->last_name,
+                'user_id' => $user->id,
+                'mentor_id' => $request['mentor']
+            ]);
+        }
 
         $user->roles()->sync($request->roles);
 
@@ -113,10 +117,33 @@ class UserController extends Controller
      */
     public function edit($id)
     {
+        $mentor = Mentor::where('user_id', $id)->first();
+        $mentee = Mentee::where('user_id', $id)->first();
+
+        if ($mentor) {
+            return view(
+                'admin.users.edit',
+                [
+                    'roles' => Role::all(),
+                    'user' => User::find($id),
+                    'mentor' => $mentor,
+                ]
+            );
+        } else if ($mentee) {
+            return view(
+                'admin.users.edit',
+                [
+                    'roles' => Role::all(),
+                    'user' => User::find($id),
+                    'mentee' => $mentee,
+                ]
+            );
+        }
+
         return view('admin.users.edit',
             [
                 'roles' => Role::all(),
-                'user' => User::find($id)
+                'user' => User::find($id),
             ]
         );
     }
@@ -144,6 +171,24 @@ class UserController extends Controller
         }
 
         $user->update($data);
+
+        if (in_array('3', $request->roles)) {
+
+            $mentor = Mentor::where('user_id', $id)->update([
+                'first_name' => $request['first-name'],
+                'last_name' => $request['last_name'],
+            ]);
+
+            if ($request->mentees) {
+                $mentor->mentees()->sync($request->mentees);
+            }
+        } else if (in_array('4', $request->roles)) {
+            Mentee::where('user_id', $id)->update([
+                'first_name' => $request['first-name'],
+                'last_name' => $request['last_name'],
+                'mentor_id' => $request['mentor']
+            ]);
+        }
 
         session()->flash('success', 'User Updated Successfully!');
 

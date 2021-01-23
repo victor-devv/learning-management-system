@@ -57,7 +57,7 @@
     <select name="roles[]" id="roles" class="form-control roles-selector" multiple>
 
         @foreach($roles as $role)
-        <option value="{{ $role->id }}" @if(isset($user)) @if($user->hasRole($role->id))
+        <option id="role{{ $role->id }}" value="{{ $role->id }}" @if(isset($user)) @if($user->hasRole($role->id))
             selected
             @endif
             @endif
@@ -67,5 +67,26 @@
 
     </select>
 </div>
+
+<div class="mb-3" hidden id="mentorSection">
+    <label for="mentor">Mentor</label>
+    <select name="mentor" id="mentor" class="form-control mentor-selector">
+        @if(isset($mentee))
+        @foreach($mentors as $mentor)
+        <option value="{{ $mentor->id }}" @if($mentor->id === $mentee->mentor_id)
+            selected
+            @endif
+            >{{ $mentor->first_name }} {{ $mentor->last_name }}</option>
+        @endforeach
+
+        @else
+        <option value="" disabled selected>Select Mentor</option>
+        @foreach($mentors as $mentor)
+        <option value="{{ $mentor->id }}">{{ $mentor->first_name }} {{ $mentor->last_name }}</option>
+        @endforeach
+        @endif
+    </select>
+</div>
+
 
 <button type="submit" class="btn btn-primary">{{ isset($user) ? 'Update User' : 'Create User' }}</button>

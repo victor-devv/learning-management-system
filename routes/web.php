@@ -29,7 +29,7 @@ Route::middleware(['auth'])->group(function () {
 
 
 // Admin Routes
-// 
+//
 Route::middleware(['auth', 'auth.isAdmin'])->prefix('admin')->name('admin.')->group(function () {
     Route::resource('/users', UserController::class);
 });

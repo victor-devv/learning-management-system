@@ -83,4 +83,19 @@ class User extends Authenticatable
         return null !== $this->roles()->whereIn('name', $role)->first();
     }
 
+    // public function isMentor($mentee_id)
+    // {
+    //     return (bool)$this->mentor()->where('mentee_id', $mentee_id)->first(['id']);
+    // }
+
+    // public function mentor()
+    // {
+    //     return $this->hasMany(Mentor::class);
+    // }
+
+    // public function hasMentor(string $mentorID)
+    // {
+    //     return null !== $this->mentor()->whereIn('name', $role)->first();
+    // }
+
 }
