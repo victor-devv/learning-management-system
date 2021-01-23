@@ -1,0 +1,13 @@
+.navbar {
+    background-color: $navBar;
+    box-shadow: 0 5px 10px 0 rgba(204, 204, 204, 0.3);
+    // margin-left: -1rem;
+    // margin-right: -1rem;
+    margin-bottom: 2rem;
+    padding: 1rem 1rem;
+
+    a {
+        color: #fff;
+        text-decoration: none;
+    }
+}
